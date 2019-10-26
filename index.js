@@ -44,6 +44,32 @@ app.delete('/api/persons/:id', (req, res) => {
     res.status(204).end();
 });
 
+const randomID = () => {
+    return Math.floor(Math.random() * 100);
+}
+
+app.post('/api/persons', (req, res) => {
+    const body = req.body;
+
+    let errorResponse = false;
+    if (!body.name) { errorResponse = 'name is missing'; }
+    else if (!body.number) { errorResponse = 'number is missing'; }
+    else if (phonebook.find(it => it.name.toLowerCase() === body.name.toLowerCase())) { errorResponse = 'name must be unique'; }
+
+    if (errorResponse) {
+        return res.status(400).json({ error: errorResponse })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: randomID()
+    }
+    phonebook = phonebook.concat(person);
+
+    res.json(person);
+})
+
 app.get('/info', (req, res) => {
     const requestTime = new Date().toLocaleString();
     res.send(`
